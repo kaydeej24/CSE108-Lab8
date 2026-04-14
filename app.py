@@ -51,9 +51,9 @@ def login():
             # LOGIN FLOW
             if user.password == password:
                 session["user_id"] = user.id
-                return "Logged in successfully"
+                return render_template("loginPost.html", textIn="Logged in successfully")
             else:
-                return "Wrong password"
+                return render_template("loginPost.html", textIn="Wrong password")
 
         else:
             # REGISTER FLOW (auto-create user)
@@ -69,7 +69,7 @@ def login():
             db.session.commit()
 
             session["user_id"] = new_user.id
-            return "User created and logged in"
+            return render_template("loginPost.html", textIn="User created and logged in")
 
     return render_template("login.html")
 
