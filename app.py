@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_migrate import Migrate
 from models import db, User, Student, Teacher, Class, Enrollment
-from werkzeug.security import generate_password_hash, check_password_hash
+#from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -30,7 +30,8 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    #return render_template("index.html")
+    return redirect(url_for('login'))
 
 @app.route("/users")
 def users():
@@ -57,8 +58,6 @@ def login():
 
         else:
             # REGISTER FLOW (auto-create user)
-            #hashed_pw = generate_password_hash(password)
-
             new_user = User(
                 username=username, #or email.split("@")[0],
                 #email=email,
@@ -71,7 +70,83 @@ def login():
             session["user_id"] = new_user.id
             return render_template("loginPost.html", textIn="User created and logged in")
 
-    return render_template("login.html")
+    return render_template("login.html") #, redirect(url_for("users"))
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        fullname = request.form["first"] + " " + request.form["last"]
+        role = request.form["role"]
+
+        user = User(
+            username=username,
+            password=password,
+            role=role
+        )
+
+        db.session.add(user)
+        db.session.flush()  # gets user.id
+
+        # 🔥 THIS is what populates other tables
+        if role == "student":
+            student = Student(
+                user_id=user.id,
+                username=username,
+                name=fullname
+            )
+            db.session.add(student)
+
+        elif role == "teacher":
+            teacher = Teacher(
+                user_id=user.id,
+                username=username,
+                name=fullname
+            )
+            db.session.add(teacher)
+
+        db.session.commit()
+
+        return render_template("loginPost.html", textIn="User created ")
+
+    return render_template("register.html")
+
+"""
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    username = request.form["username"]
+    password = request.form["password"]
+    role = request.form["role"]
+
+    user = User(
+        username=username,
+        password=password,
+        role=role
+    )
+
+    db.session.add(user)
+    db.session.flush()  # gets user.id
+
+    # 🔥 THIS is what populates other tables
+    if role == "student":
+        student = Student(
+            user_id=user.id,
+            name=username
+        )
+        db.session.add(student)
+
+    elif role == "teacher":
+        teacher = Teacher(
+            user_id=user.id,
+            name=username
+        )
+        db.session.add(teacher)
+
+    db.session.commit()
+
+    return "User created"
+"""
 
 @app.route("/dashboard")
 def dashboard():
