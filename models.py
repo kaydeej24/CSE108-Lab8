@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -9,15 +10,21 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    #email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False, server_default="password")
+    role = db.Column(db.String(20), nullable=False, server_default="student")
+
 
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False, server_default="defaultTeach")
     name = db.Column(db.String(80), nullable=False)
     
-
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False, server_default="defaultStudent")
+    name = db.Column(db.String(80), nullable=False)
 
 class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
