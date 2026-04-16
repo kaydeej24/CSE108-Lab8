@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Grades</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6fa;
+            padding: 20px;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background: #2f5aa8;
+            color: white;
+        }
+
+        input {
+            width: 60px;
+        }
+
+        button {
+            background: #2f5aa8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>{{ course.name }}</h2>
+    <p><b>Teacher:</b> {{ course.teacher }}</p>
+
+    <h3>Students & Grades</h3>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Grade</th>
+            <th>Action</th>
+        </tr>
+
+        {% for s in course.students %}
+        <tr>
+            <form method="POST" action="/update_grade/{{ course.id }}">
+                <td>
+                    {{ s.name }}
+                    <input type="hidden" name="name" value="{{ s.name }}">
+                </td>
+
+                <td>
+                    <input type="number" name="grade" value="{{ s.grade }}">
+                </td>
+
+                <td>
+                    <button type="submit">Update</button>
+                </td>
+            </form>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

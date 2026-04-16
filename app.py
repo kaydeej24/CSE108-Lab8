@@ -1,160 +1,174 @@
-from flask import Flask, render_template, request, render_template, redirect, url_for, session
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-from flask_migrate import Migrate
-from models import db, User, Student, Teacher, Class, Enrollment
-#from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = "secret-key"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret'
+# ---------------- USERS ----------------
+users = {
+    "jsmith": {"password": "password", "role": "student", "full_name": "James Smith"},
+    "mgarcia": {"password": "password", "role": "student", "full_name": "Maria Garcia"},
+    "ajohnson": {"password": "password", "role": "student", "full_name": "Alex Johnson"},
+    "edavis": {"password": "password", "role": "student", "full_name": "Emily Davis"},
+    "mbrown": {"password": "password", "role": "student", "full_name": "Michael Brown"},
+    "swilson": {"password": "password", "role": "student", "full_name": "Sarah Wilson"},
+    "dlee": {"password": "password", "role": "student", "full_name": "David Lee"},
+    "jtaylor": {"password": "password", "role": "student", "full_name": "Jessica Taylor"},
+    "dmartinez": {"password": "password", "role": "student", "full_name": "Daniel Martinez"},
+    "sanderson": {"password": "password", "role": "student", "full_name": "Sophia Anderson"},
+    "teacher": {"password": "password", "role": "teacher", "full_name": "Teacher"}
+}
 
-# init db
-db.init_app(app)
-# migrations
-migrate = Migrate(app, db)
+# ---------------- COURSES ----------------
+course_catalog = [
+    {"id": 101, "name": "Calculus I", "teacher": "Dr. Newton", "time": "MWF 9-10"},
+    {"id": 102, "name": "Chemistry 101", "teacher": "Dr. Curie", "time": "TR 10-11"},
+    {"id": 103, "name": "Biology 101", "teacher": "Dr. Darwin", "time": "MWF 1-2"},
+    {"id": 104, "name": "English Composition", "teacher": "Dr. Austen", "time": "TR 12-1"},
+    {"id": 105, "name": "US History", "teacher": "Dr. Lincoln", "time": "MWF 2-3"},
+    {"id": 106, "name": "Psychology 101", "teacher": "Dr. Freud", "time": "TR 3-4"},
+    {"id": 107, "name": "Philosophy 101", "teacher": "Dr. Socrates", "time": "MWF 11-12"},
+    {"id": 108, "name": "Computer Science 101", "teacher": "Dr. Turing", "time": "TR 1-2"}
+]
 
-# admin
-admin = Admin(app, name="Dashboard")
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Student, db.session))
-admin.add_view(ModelView(Teacher, db.session))
-admin.add_view(ModelView(Class, db.session))
-admin.add_view(ModelView(Enrollment, db.session))
+# ---------------- ENROLLMENTS ----------------
+user_courses = {
+    "jsmith": [101, 103],
+    "mgarcia": [102],
+    "ajohnson": [105],
+    "edavis": [],
+    "mbrown": [],
+    "swilson": [],
+    "dlee": [],
+    "jtaylor": [],
+    "dmartinez": [],
+    "sanderson": []
+}
 
-# create tables
-with app.app_context():
-    db.create_all()
+# ---------------- HELPERS ----------------
+def count_students(course_id):
+    return sum(course_id in courses for courses in user_courses.values())
 
-@app.route("/")
-def home():
-    #return render_template("index.html")
-    return redirect(url_for('login'))
-
-@app.route("/users")
-def users():
-    all_users = User.query.all()
-    return render_template("users.html", users=all_users)
-
-@app.route("/login", methods=["GET", "POST"])
+# ---------------- LOGIN ----------------
+@app.route("/", methods=["GET", "POST"])
 def login():
-    if request.method == "POST":
-        #email = request.form["email"]
-        password = request.form["password"]
-        username = request.form.get("username")
-
-        # 1. check if user exists
-        user = User.query.filter_by(username=username).first()
-
-        if user:
-            # LOGIN FLOW
-            if user.password == password:
-                session["user_id"] = user.id
-                return render_template("loginPost.html", textIn="Logged in successfully")
-            else:
-                return render_template("loginPost.html", textIn="Wrong password")
-
-        else:
-            # REGISTER FLOW (auto-create user)
-            new_user = User(
-                username=username, #or email.split("@")[0],
-                #email=email,
-                password=password
-            )
-
-            db.session.add(new_user)
-            db.session.commit()
-
-            session["user_id"] = new_user.id
-            return render_template("loginPost.html", textIn="User created and logged in")
-
-    return render_template("login.html") #, redirect(url_for("users"))
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        fullname = request.form["first"] + " " + request.form["last"]
-        role = request.form["role"]
 
-        user = User(
-            username=username,
-            password=password,
-            role=role
-        )
+        if username in users and users[username]["password"] == password:
+            session["user"] = username
+            session["role"] = users[username]["role"]
+            user_courses.setdefault(username, [])
 
-        db.session.add(user)
-        db.session.flush()  # gets user.id
+            if session["role"] == "teacher":
+                return redirect(url_for("teacher_dashboard"))
+            else:
+                return redirect(url_for("dashboard"))
 
-        # 🔥 THIS is what populates other tables
-        if role == "student":
-            student = Student(
-                user_id=user.id,
-                username=username,
-                name=fullname
-            )
-            db.session.add(student)
+        return "Invalid credentials"
 
-        elif role == "teacher":
-            teacher = Teacher(
-                user_id=user.id,
-                username=username,
-                name=fullname
-            )
-            db.session.add(teacher)
+    return render_template("login.html")
 
-        db.session.commit()
-
-        return render_template("loginPost.html", textIn="User created ")
-
-    return render_template("register.html")
-
-"""
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    username = request.form["username"]
-    password = request.form["password"]
-    role = request.form["role"]
-
-    user = User(
-        username=username,
-        password=password,
-        role=role
-    )
-
-    db.session.add(user)
-    db.session.flush()  # gets user.id
-
-    # 🔥 THIS is what populates other tables
-    if role == "student":
-        student = Student(
-            user_id=user.id,
-            name=username
-        )
-        db.session.add(student)
-
-    elif role == "teacher":
-        teacher = Teacher(
-            user_id=user.id,
-            name=username
-        )
-        db.session.add(teacher)
-
-    db.session.commit()
-
-    return "User created"
-"""
-
+# ---------------- STUDENT DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
-    if "user_id" not in session:
+    if session.get("role") != "student":
         return redirect(url_for("login"))
 
-    user = User.query.get(session["user_id"])
-    return f"Hello {user.username}"
+    user = session["user"]
+    enrolled = user_courses.get(user, [])
+
+    my_courses = []
+    available = []
+
+    for c in course_catalog:
+        c2 = {**c, "student_count": count_students(c["id"])}
+
+        if c["id"] in enrolled:
+            my_courses.append(c2)
+        else:
+            available.append(c2)
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+        classes=my_courses,
+        course_catalog=available
+    )
+
+# ---------------- JOIN / DELETE ----------------
+@app.route("/join/<int:course_id>")
+def join(course_id):
+    user = session["user"]
+    user_courses.setdefault(user, [])
+
+    if course_id not in user_courses[user]:
+        user_courses[user].append(course_id)
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/delete/<int:course_id>")
+def delete(course_id):
+    user = session["user"]
+
+    if course_id in user_courses[user]:
+        user_courses[user].remove(course_id)
+
+    return redirect(url_for("dashboard"))
+
+# ---------------- TEACHER DASHBOARD (RESTORED TABS STYLE) ----------------
+@app.route("/teacher")
+def teacher_dashboard():
+    if session.get("role") != "teacher":
+        return redirect(url_for("login"))
+
+    courses_with_counts = []
+    students = []
+
+    for c in course_catalog:
+        courses_with_counts.append({
+            **c,
+            "student_count": count_students(c["id"])
+        })
+
+    for username, data in users.items():
+        if data["role"] == "student":
+            students.append({
+                "username": username,
+                "name": data["full_name"],
+                "courses": user_courses.get(username, [])
+            })
+
+    return render_template(
+        "teacher.html",
+        courses=courses_with_counts,
+        students=students,
+        course_catalog=course_catalog,
+        user_courses=user_courses
+    )
+
+# ---------------- TEACHER ADD/REMOVE ----------------
+@app.route("/teacher/add/<username>/<int:course_id>")
+def teacher_add(username, course_id):
+    user_courses.setdefault(username, [])
+
+    if course_id not in user_courses[username]:
+        user_courses[username].append(course_id)
+
+    return redirect(url_for("teacher_dashboard"))
+
+@app.route("/teacher/remove/<username>/<int:course_id>")
+def teacher_remove(username, course_id):
+    if username in user_courses and course_id in user_courses[username]:
+        user_courses[username].remove(course_id)
+
+    return redirect(url_for("teacher_dashboard"))
+
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #e9eef6;
+        }
+
+        .header {
+            background: #2f5aa8;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .wrapper {
+            margin: 20px;
+            border: 2px solid #4a6fb3;
+            background: #3f6fc1;
+            padding: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #2f5aa8;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #5a86d6;
+            color: white;
+        }
+
+        .inactive {
+            background: #b8c7e6;
+        }
+
+        .content {
+            background: white;
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        th {
+            background: #4a6fb3;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        a {
+            font-weight: bold;
+            text-decoration: none;
+            color: #2f5aa8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div>Teacher Dashboard</div>
+    <div><a style="color:white" href="/logout">Logout</a></div>
+</div>
+
+<div class="wrapper">
+
+    <div class="tabs">
+        <div class="tab active" onclick="show('courses')">Courses</div>
+        <div class="tab inactive" onclick="show('students')">Students</div>
+    </div>
+
+    <div class="content">
+
+        <!-- COURSES TAB -->
+        <div id="courses">
+
+            <table>
+                <tr>
+                    <th>Course</th>
+                    <th>Teacher</th>
+                    <th>Students</th>
+                </tr>
+
+                {% for c in courses %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.teacher }}</td>
+                    <td>{{ c.student_count }}/10</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+
+        <!-- STUDENTS TAB -->
+        <div id="students" class="hidden">
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Courses</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.username }}</td>
+                    <td>{{ s.courses|length }}</td>
+                    <td>
+                        {% for c in course_catalog %}
+                            {% if c.id not in s.courses %}
+                                <a href="/teacher/add/{{ s.username }}/{{ c.id }}">Add {{ c.name }}</a><br>
+                            {% else %}
+                                <a href="/teacher/remove/{{ s.username }}/{{ c.id }}">Remove {{ c.name }}</a><br>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+function show(tab) {
+    const courses = document.getElementById("courses");
+    const students = document.getElementById("students");
+
+    const tabs = document.getElementsByClassName("tab");
+
+    if (tab === "courses") {
+        courses.classList.remove("hidden");
+        students.classList.add("hidden");
+
+        tabs[0].classList.add("active");
+        tabs[1].classList.remove("active");
+    } else {
+        students.classList.remove("hidden");
+        courses.classList.add("hidden");
+
+        tabs[1].classList.add("active");
+        tabs[0].classList.remove("active");
+    }
+}
+</script>
+
+</body>
+</html>

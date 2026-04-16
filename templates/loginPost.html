@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="../static/css/loginresult.css">
-        <title>Sign In</title>
-    </head>
-    <body>
-        <div class="result-container">
-            <h2>{{textIn}}</h2>
-        </div>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="2;url={{ url_for('dashboard') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <title>Success</title>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>{{ textIn }}</h2>
+        <p>Redirecting to dashboard...</p>
+    </div>
+
+</body>
 </html>
-
-
-
