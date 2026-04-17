@@ -20,8 +20,6 @@ migrate = Migrate(app, db)
 # admin
 admin = Admin(app, name="Dashboard")
 admin.add_view(ModelView(User, db.session))
-#admin.add_view(ModelView(Student, db.session))
-#admin.add_view(ModelView(Teacher, db.session))
 admin.add_view(ModelView(Class, db.session))
 admin.add_view(ModelView(Enrollment, db.session))
 

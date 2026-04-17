@@ -2,88 +2,43 @@
 <html>
     <head>
         <title>Teacher Management</title>
-
-        <style>
-            body {
-                font-family: Arial;
-                margin: 0;
-                background: #eef2f7;
-            }
-
-            .header {
-                background: #2f5aa8;
-                color: white;
-                padding: 15px;
-                display: flex;
-                justify-content: space-between;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            th, td {
-                border: 1px solid #ccc;
-                padding: 10px;
-            }
-
-            th {
-                background: #4a6fb3;
-                color: white;
-            }
-
-            a {
-                text-decoration: none;
-                font-weight: bold;
-                color: #2f5aa8;
-            }
-        </style>
     </head>
-
     <body>
 
-    <div class="header">
-        <div>Teacher Management</div>
-        <div><a style="color:white" href="/logout">Logout</a></div>
-    </div>
+        <div class="header">
+            <div>Teacher Management</div>
+            <div><a style="color:white" href="/logout">Logout</a></div>
+        </div>
 
-    <div class="container">
+        <div class="container">
 
-        <h2>Student Management</h2>
+            <h2>Student Management</h2>
 
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Courses</th>
-                <th>Actions</th>
-            </tr>
+            <table>
+                <tr> <!--title row-->
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Courses</th>
+                    <th>Actions</th>
+                </tr>
 
-            {% for s in students %}
-            <tr>
-                <td>{{ s.name }}</td>
-                <td>{{ s.username }}</td>
-                <td>{{ s.courses|length }}</td>
-                <td>
-                    {% for c in courses %}
-                        {% if c.id not in s.courses %}
-                            <a href="/teacher/add/{{ s.username }}/{{ c.id }}">Add {{ c.name }}</a><br>
-                        {% else %}
-                            <a href="/teacher/remove/{{ s.username }}/{{ c.id }}">Remove {{ c.name }}</a><br>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-
-        </table>
-
-    </div>
-
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.username }}</td>
+                    <td>{{ s.courses|length }}</td>
+                    <td>
+                        {% for c in courses %}
+                            {% if c.id not in s.courses %}
+                                <a href="/teacher/add/{{ s.username }}/{{ c.id }}">Add {{ c.name }}</a><br>
+                            {% else %}
+                                <a href="/teacher/remove/{{ s.username }}/{{ c.id }}">Remove {{ c.name }}</a><br>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
     </body>
 </html>
