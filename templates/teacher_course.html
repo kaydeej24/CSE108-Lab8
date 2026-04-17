@@ -1,72 +1,70 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{{ course.name }}</title>
+    <head>
+        <title>{{ course.name }}</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #eef2f7;
-            padding: 20px;
-        }
+        <style>
+            body {
+                font-family: Arial;
+                background: #eef2f7;
+                padding: 20px;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+            }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 10px;
+            }
 
-        th {
-            background: #4a6fb3;
-            color: white;
-        }
+            th {
+                background: #4a6fb3;
+                color: white;
+            }
 
-        input {
-            width: 60px;
-        }
+            input {
+                width: 60px;
+            }
 
-        button {
-            margin-top: 10px;
-            padding: 10px;
-        }
-    </style>
-</head>
+            button {
+                margin-top: 10px;
+                padding: 10px;
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
 
-<h2>{{ course.name }} - Gradebook</h2>
+    <h2>{{ course.name }} - Gradebook</h2>
 
-<form method="POST">
+    <form method="POST">
+        <table>
+            <tr>
+                <th>Student</th>
+                <th>Username</th>
+                <th>Grade</th>
+            </tr>
 
-<table>
-    <tr>
-        <th>Student</th>
-        <th>Username</th>
-        <th>Grade</th>
-    </tr>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.username }}</td>
+                <td>
+                    <input name="grade_{{ s.username }}" value="{{ s.grade }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    <button type="submit">Save Grades</button>
 
-    {% for s in students %}
-    <tr>
-        <td>{{ s.name }}</td>
-        <td>{{ s.username }}</td>
-        <td>
-            <input name="grade_{{ s.username }}" value="{{ s.grade }}">
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    </form>
 
-<button type="submit">Save Grades</button>
+    <br>
+    <a href="/teacher">← Back</a>
 
-</form>
-
-<br>
-<a href="/teacher">← Back</a>
-
-</body>
+    </body>
 </html>
