@@ -44,6 +44,9 @@ user_courses = {
     "sanderson": []
 }
 
+# ---------------- GRADES ----------------
+grades = {}
+
 # ---------------- HELPERS ----------------
 def count_students(course_id):
     return sum(course_id in courses for courses in user_courses.values())
@@ -58,6 +61,7 @@ def login():
         if username in users and users[username]["password"] == password:
             session["user"] = username
             session["role"] = users[username]["role"]
+
             user_courses.setdefault(username, [])
 
             if session["role"] == "teacher":
@@ -116,20 +120,17 @@ def delete(course_id):
 
     return redirect(url_for("dashboard"))
 
-# ---------------- TEACHER DASHBOARD (RESTORED TABS STYLE) ----------------
+# ---------------- TEACHER DASHBOARD ----------------
 @app.route("/teacher")
 def teacher_dashboard():
     if session.get("role") != "teacher":
         return redirect(url_for("login"))
 
-    courses_with_counts = []
+    courses = []
     students = []
 
     for c in course_catalog:
-        courses_with_counts.append({
-            **c,
-            "student_count": count_students(c["id"])
-        })
+        courses.append({**c, "student_count": count_students(c["id"])})
 
     for username, data in users.items():
         if data["role"] == "student":
@@ -141,27 +142,53 @@ def teacher_dashboard():
 
     return render_template(
         "teacher.html",
-        courses=courses_with_counts,
+        courses=courses,
         students=students,
-        course_catalog=course_catalog,
-        user_courses=user_courses
+        course_catalog=course_catalog
     )
 
-# ---------------- TEACHER ADD/REMOVE ----------------
+# ---------------- GRADEBOOK ----------------
+@app.route("/teacher/course/<int:course_id>", methods=["GET", "POST"])
+def teacher_course(course_id):
+    if session.get("role") != "teacher":
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        for key in request.form:
+            if key.startswith("grade_"):
+                username = key.split("_")[1]
+                grades[(username, course_id)] = request.form[key]
+
+    enrolled_students = []
+
+    for username, courses in user_courses.items():
+        if course_id in courses:
+            enrolled_students.append({
+                "username": username,
+                "name": users[username]["full_name"],
+                "grade": grades.get((username, course_id), "")
+            })
+
+    course = next(c for c in course_catalog if c["id"] == course_id)
+
+    return render_template(
+        "teacher_course.html",
+        course=course,
+        students=enrolled_students
+    )
+
+# ---------------- ADD / REMOVE ----------------
 @app.route("/teacher/add/<username>/<int:course_id>")
 def teacher_add(username, course_id):
     user_courses.setdefault(username, [])
-
     if course_id not in user_courses[username]:
         user_courses[username].append(course_id)
-
     return redirect(url_for("teacher_dashboard"))
 
 @app.route("/teacher/remove/<username>/<int:course_id>")
 def teacher_remove(username, course_id):
-    if username in user_courses and course_id in user_courses[username]:
+    if course_id in user_courses.get(username, []):
         user_courses[username].remove(course_id)
-
     return redirect(url_for("teacher_dashboard"))
 
 # ---------------- LOGOUT ----------------
@@ -171,4 +198,4 @@ def logout():
     return redirect(url_for("login"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
