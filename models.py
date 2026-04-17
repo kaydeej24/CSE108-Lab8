@@ -10,12 +10,13 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False)
-    #email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False, server_default="password")
     role = db.Column(db.String(20), nullable=False, server_default="student")
+    name = db.Column(db.String(80), nullable=False)
 
 
 
+"""
 class Teacher(db.Model):
     __tablename__ = "teacher"
 
@@ -50,7 +51,8 @@ class Student(db.Model):
     name = db.Column(db.String(80), nullable=False)
 
     user = db.relationship("User", backref="student_profile")
-
+"""
+    
 class Class(db.Model):
     __tablename__ = "class"
 
@@ -58,7 +60,7 @@ class Class(db.Model):
     name = db.Column(db.String(80), nullable=False)
     timing = db.Column(db.String(120))
 
-    teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"))
+    #teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"))
 
     enrollment = db.Column(db.Integer, nullable=False, server_default=text("0"))
     capacity = db.Column(db.Integer, nullable=False, server_default=text("50"))

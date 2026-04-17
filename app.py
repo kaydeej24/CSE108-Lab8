@@ -1,7 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_migrate import Migrate
+from models import db, User, Class, Enrollment #, Student, Teacher
 
 app = Flask(__name__)
 app.secret_key = "secret-key"
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'secret'
+
+# init db
+db.init_app(app)
+# migrations
+migrate = Migrate(app, db)
+
+# admin
+admin = Admin(app, name="Dashboard")
+admin.add_view(ModelView(User, db.session))
+#admin.add_view(ModelView(Student, db.session))
+#admin.add_view(ModelView(Teacher, db.session))
+admin.add_view(ModelView(Class, db.session))
+admin.add_view(ModelView(Enrollment, db.session))
+
+# create tables
+with app.app_context():
+    db.create_all()
 
 # ---------------- USERS ----------------
 users = {
