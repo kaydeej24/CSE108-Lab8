@@ -1,198 +1,114 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Dashboard</title>
+    <head>
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="../static/css/dashboard.css">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #e9eef6;
-        }
+    </head>
 
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            background: #d9e2f3;
-            border-bottom: 2px solid #4a6fb3;
-        }
+    <body>
 
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .header a {
-            text-decoration: none;
-            color: #1a4fb3;
-            font-weight: bold;
-        }
-
-        /* WRAPPER */
-        .wrapper {
-            margin: 20px;
-            border: 2px solid #4a6fb3;
-            background: #3f6fc1;
-            padding: 15px;
-        }
-
-        /* TABS */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #2f5aa8;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .active {
-            background: #5a86d6;
-            color: white;
-        }
-
-        .inactive {
-            background: #b8c7e6;
-            color: #1f2d4d;
-        }
-
-        /* CONTENT */
-        .content {
-            padding: 20px;
-            background: #3f6fc1;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
-        }
-
-        th {
-            background: #4a6fb3;
-            color: white;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-
-<!-- HEADER -->
-<div class="header">
-    <div class="welcome">Welcome, {{ user }}!</div>
-    <div class="title">ACME University</div>
-    <div><a href="/logout">Sign out</a></div>
-</div>
-
-<!-- WRAPPER -->
-<div class="wrapper">
-
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('mine')">Your Courses</div>
-        <div class="tab inactive" onclick="showTab('add')">Add Courses</div>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="welcome">Welcome, {{ user }}!</div>
+        <div class="title">ACME University</div>
+        <div><a href="/logout">Sign out</a></div>
     </div>
 
-    <div class="content">
+    <!-- WRAPPER -->
+    <div class="wrapper">
 
-        <!-- YOUR COURSES -->
-        <div id="mine">
-
-            <table>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Teacher</th>
-                    <th>Time</th>
-                    <th>Students</th>
-                    <th>Action</th>
-                </tr>
-
-                {% for c in classes %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.teacher }}</td>
-                    <td>{{ c.time }}</td>
-                    <td>{{ c.student_count }}/10</td>
-                    <td><a href="/delete/{{ c.id }}">Delete</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('mine')">Your Courses</div>
+            <div class="tab inactive" onclick="showTab('add')">Add Courses</div>
         </div>
 
-        <!-- ADD COURSES -->
-        <div id="add" class="hidden">
+        <div class="content">
 
-            <table>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Teacher</th>
-                    <th>Time</th>
-                    <th>Students</th>
-                    <th>Action</th>
-                </tr>
+            <!-- YOUR COURSES -->
+            <div id="mine">
 
-                {% for c in course_catalog %}
-                <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.teacher }}</td>
-                    <td>{{ c.time }}</td>
-                    <td>{{ c.student_count }}/10</td>
-                    <td><a href="/join/{{ c.id }}">Join</a></td>
-                </tr>
-                {% endfor %}
+                <table>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Teacher</th>
+                        <th>Time</th>
+                        <th>Students</th>
+                        <th>Action</th>
+                    </tr>
 
-            </table>
+                    {% for c in classes %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.teacher }}</td>
+                        <td>{{ c.time }}</td>
+                        <td>{{ c.student_count }}/{{c.capacity}}</td>
+                        <td><a href="/delete/{{ c.id }}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+
+            <!-- ADD COURSES -->
+            <div id="add" class="hidden">
+
+                <table>
+                    <tr>
+                        <th>Course Name 2</th>
+                        <th>Teacher</th>
+                        <th>Time</th>
+                        <th>Students</th>
+                        <th>Action</th>
+                    </tr>
+
+                    {% for c in course_catalog %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.teacher.name }}</td>
+                        <td>{{ c.timing }}</td>
+                        <td>{{ c.student_count }}/10</td>
+                        <td><a href="/join/{{ c.id }}">Join</a></td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+            </div>
 
         </div>
-
     </div>
-</div>
+    <link rel="script" href="../static/js/dashboard.js">
 
-<!-- TAB SCRIPT -->
-<script>
-function showTab(tab) {
-    const mine = document.getElementById("mine");
-    const add = document.getElementById("add");
+    <script>
+    function showTab(tab) {
+        const mine = document.getElementById("mine");
+        const add = document.getElementById("add");
 
-    const tabs = document.getElementsByClassName("tab");
+        const tabs = document.getElementsByClassName("tab");
 
-    if (tab === "mine") {
-        mine.classList.remove("hidden");
-        add.classList.add("hidden");
+        if (tab === "mine") {
+            mine.classList.remove("hidden");
+            add.classList.add("hidden");
 
-        tabs[0].classList.add("active");
-        tabs[0].classList.remove("inactive");
+            tabs[0].classList.add("active");
+            tabs[0].classList.remove("inactive");
 
-        tabs[1].classList.add("inactive");
-        tabs[1].classList.remove("active");
-    } else {
-        add.classList.remove("hidden");
-        mine.classList.add("hidden");
+            tabs[1].classList.add("inactive");
+            tabs[1].classList.remove("active");
+        } else {
+            add.classList.remove("hidden");
+            mine.classList.add("hidden");
 
-        tabs[1].classList.add("active");
-        tabs[1].classList.remove("inactive");
+            tabs[1].classList.add("active");
+            tabs[1].classList.remove("inactive");
 
-        tabs[0].classList.add("inactive");
-        tabs[0].classList.remove("active");
+            tabs[0].classList.add("inactive");
+            tabs[0].classList.remove("active");
+        }
     }
-}
-</script>
+    </script>
 
-</body>
+    </body>
 </html>

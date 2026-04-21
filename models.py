@@ -1,36 +1,22 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
-#from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import UniqueConstraint
 
 db = SQLAlchemy()
-
 
 class User(db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
+    username = db.Column(db.String(80), nullable=False, unique=True)
     name = db.Column(db.String(80), nullable=False)
-    password = db.Column(db.String(80), nullable=False, server_default="password")
-    role = db.Column(db.String(20), nullable=False, server_default="student")
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), nullable=False)  # "student" or "teacher"
 
-class Student(db.Model):
-    __tablename__ = "student"
+    # relationships
+    enrollments = db.relationship("Enrollment", back_populates="student", cascade="all, delete")
+    classes_teaching = db.relationship("Class", back_populates="teacher")
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
-    name = db.Column(db.String(80), nullable=False)
-    password = db.Column(db.String(80), nullable=False, server_default="password")
 
-class Teacher(db.Model):
-    __tablename__ = "teacher"
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
-    name = db.Column(db.String(80), nullable=False)
-    password = db.Column(db.String(80), nullable=False, server_default="password")
-    
- 
 class Class(db.Model):
     __tablename__ = "class"
 
@@ -39,20 +25,26 @@ class Class(db.Model):
     timing = db.Column(db.String(120))
 
     teacher_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    capacity = db.Column(db.Integer, nullable=False, default=50)
 
-    enrollment = db.Column(db.Integer, nullable=False, server_default=text("0"))
-    capacity = db.Column(db.Integer, nullable=False, server_default=text("50"))
+    # relationships
+    teacher = db.relationship("User", back_populates="classes_teaching")
+    enrollments = db.relationship("Enrollment", back_populates="course", cascade="all, delete")
 
-    # relationship
-    teacher = db.relationship("User", backref="classes_teaching")
-    
 
 class Enrollment(db.Model):
     __tablename__ = "enrollment"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    # comment out name variable
-    # class_id = 
-    # student_id
 
+    student_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    class_id = db.Column(db.Integer, db.ForeignKey("class.id"))
+
+    # prevent duplicates
+    __table_args__ = (
+        UniqueConstraint("student_id", "class_id", name="unique_enrollment"),
+    )
+
+    # relationships
+    student = db.relationship("User", back_populates="enrollments")
+    course = db.relationship("Class", back_populates="enrollments")

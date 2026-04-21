@@ -1,217 +1,125 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Teacher Dashboard</title>
+    <head>
+        <title>Teacher Dashboard</title>
+        <link rel="stylesheet" href="../static/css/teacher.css">
+    </head>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            background: #e9eef6;
-        }
+    <body>
 
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            background: #d9e2f3;
-            border-bottom: 2px solid #4a6fb3;
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .header a {
-            text-decoration: none;
-            color: #1a4fb3;
-            font-weight: bold;
-        }
-
-        /* WRAPPER */
-        .wrapper {
-            margin: 20px;
-            border: 2px solid #4a6fb3;
-            background: #3f6fc1;
-            padding: 15px;
-        }
-
-        /* TABS */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #2f5aa8;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .active {
-            background: #5a86d6;
-            color: white;
-        }
-
-        .inactive {
-            background: #b8c7e6;
-            color: #1f2d4d;
-        }
-
-        /* CONTENT */
-        .content {
-            padding: 20px;
-            background: #3f6fc1;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        th {
-            background: #4a6fb3;
-            color: white;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        a {
-            text-decoration: none;
-            color: #2f5aa8;
-            font-weight: bold;
-        }
-    </style>
-</head>
-
-<body>
-
-<!-- HEADER -->
-<div class="header">
-    <div class="title">ACME University - Teacher</div>
-    <div><a href="/logout">Sign out</a></div>
-</div>
-
-<!-- WRAPPER -->
-<div class="wrapper">
-
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('courses')">Courses</div>
-        <div class="tab inactive" onclick="showTab('students')">Students</div>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="title">ACME University - Teacher</div>
+        <div><a href="/logout">Sign out</a></div>
     </div>
 
-    <div class="content">
+    <!-- WRAPPER -->
+    <div class="wrapper">
 
-        <!-- COURSES TAB -->
-        <div id="courses">
-
-            <table>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Teacher</th>
-                    <th>Time</th>
-                    <th>Students</th>
-                </tr>
-
-                {% for c in courses %}
-                <tr>
-                    <!-- CLICKABLE COURSE (GOES TO GRADEBOOK) -->
-                    <td>
-                        <a href="/teacher/course/{{ c.id }}">
-                            {{ c.name }}
-                        </a>
-                    </td>
-                    <td>{{ c.teacher }}</td>
-                    <td>{{ c.time }}</td>
-                    <td>{{ c.student_count }}/10</td>
-                </tr>
-                {% endfor %}
-
-            </table>
-
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('courses')">Courses</div>
+            <div class="tab inactive" onclick="showTab('students')">Students</div>
         </div>
 
-        <!-- STUDENTS TAB -->
-        <div id="students" class="hidden">
+        <div class="content">
 
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Courses</th>
-                    <th>Actions</th>
-                </tr>
+            <!-- COURSES TAB -->
+            <div id="courses">
 
-                {% for s in students %}
-                <tr>
-                    <td>{{ s.name }}</td>
-                    <td>{{ s.username }}</td>
-                    <td>{{ s.courses|length }}</td>
-                    <td>
-                        {% for c in course_catalog %}
-                            {% if c.id not in s.courses %}
-                                <a href="/teacher/add/{{ s.username }}/{{ c.id }}">
-                                    Add {{ c.name }}
-                                </a><br>
-                            {% else %}
-                                <a href="/teacher/remove/{{ s.username }}/{{ c.id }}">
-                                    Remove {{ c.name }}
-                                </a><br>
-                            {% endif %}
-                        {% endfor %}
-                    </td>
-                </tr>
-                {% endfor %}
+                <table>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Teacher</th>
+                        <th>Time</th>
+                        <th>Students</th>
+                    </tr>
 
-            </table>
+                    {% for c in courses %}
+                    <tr>
+                        <!-- CLICKABLE COURSE (GOES TO GRADEBOOK) -->
+                        <td>
+                            <a href="/teacher/course/{{ c.id }}">
+                                {{ c.name }}
+                            </a>
+                        </td>
+                        <td>{{ c.teacher }}</td>
+                        <td>{{ c.time }}</td>
+                        <td>{{ c.student_count }}/10</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+            <!-- STUDENTS TAB -->
+            <div id="students" class="hidden">
+
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Courses</th>
+                        <th>Actions</th>
+                    </tr>
+
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ s.name }}</td>
+                        <td>{{ s.username }}</td>
+                        <td>{{ s.courses|length }}</td>
+                        <td>
+                            {% for c in course_catalog %}
+                                {% if c.id not in s.courses %}
+                                    <a href="/teacher/add/{{ s.username }}/{{ c.id }}">
+                                        Add {{ c.name }}
+                                    </a><br>
+                                {% else %}
+                                    <a href="/teacher/remove/{{ s.username }}/{{ c.id }}">
+                                        Remove {{ c.name }}
+                                    </a><br>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+            </div>
 
         </div>
-
     </div>
-</div>
 
-<!-- TAB SCRIPT -->
-<script>
-function showTab(tab) {
-    const courses = document.getElementById("courses");
-    const students = document.getElementById("students");
-    const tabs = document.getElementsByClassName("tab");
+    <!-- TAB SCRIPT -->
+    <script>
+    function showTab(tab) {
+        const courses = document.getElementById("courses");
+        const students = document.getElementById("students");
+        const tabs = document.getElementsByClassName("tab");
 
-    if (tab === "courses") {
-        courses.classList.remove("hidden");
-        students.classList.add("hidden");
+        if (tab === "courses") {
+            courses.classList.remove("hidden");
+            students.classList.add("hidden");
 
-        tabs[0].classList.add("active");
-        tabs[0].classList.remove("inactive");
+            tabs[0].classList.add("active");
+            tabs[0].classList.remove("inactive");
 
-        tabs[1].classList.add("inactive");
-        tabs[1].classList.remove("active");
-    } else {
-        students.classList.remove("hidden");
-        courses.classList.add("hidden");
+            tabs[1].classList.add("inactive");
+            tabs[1].classList.remove("active");
+        } else {
+            students.classList.remove("hidden");
+            courses.classList.add("hidden");
 
-        tabs[1].classList.add("active");
-        tabs[1].classList.remove("inactive");
+            tabs[1].classList.add("active");
+            tabs[1].classList.remove("inactive");
 
-        tabs[0].classList.add("inactive");
-        tabs[0].classList.remove("active");
+            tabs[0].classList.add("inactive");
+            tabs[0].classList.remove("active");
+        }
     }
-}
-</script>
+    </script>
 
-</body>
+    </body>
 </html>

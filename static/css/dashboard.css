@@ -1,65 +1,83 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #d9e2f3;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #e9eef6;
+        }
 
-.page {
-    width: 900px;
-    margin: 40px auto;
-    background: #c9d6ee;
-    border: 2px solid #3b5aa3;
-    padding: 20px;
-}
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #d9e2f3;
+            border-bottom: 2px solid #4a6fb3;
+        }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
-}
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-.center {
-    font-size: 22px;
-    font-weight: bold;
-}
+        .header a {
+            text-decoration: none;
+            color: #1a4fb3;
+            font-weight: bold;
+        }
 
-.tabs {
-    display: flex;
-    margin-top: 15px;
-}
+        /* WRAPPER */
+        .wrapper {
+            margin: 20px;
+            border: 2px solid #4a6fb3;
+            background: #3f6fc1;
+            padding: 15px;
+        }
 
-.tab {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background: #8faadc;
-    cursor: pointer;
-}
+        /* TABS */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #2f5aa8;
+        }
 
-.tab.active {
-    background: #4472c4;
-    color: white;
-}
+        .tab {
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.content {
-    background: #4472c4;
-    padding: 20px;
-    margin-top: 10px;
-}
+        .active {
+            background: #5a86d6;
+            color: white;
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
+        .inactive {
+            background: #b8c7e6;
+            color: #1f2d4d;
+        }
 
-th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
-}
+        /* CONTENT */
+        .content {
+            padding: 20px;
+            background: #3f6fc1;
+        }
 
-th {
-    background: #a9bce3;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background: #4a6fb3;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
