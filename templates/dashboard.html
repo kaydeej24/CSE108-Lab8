@@ -68,7 +68,7 @@
                         <td>{{ c.name }}</td>
                         <td>{{ c.teacher.name }}</td>
                         <td>{{ c.timing }}</td>
-                        <td>{{ c.student_count }}/10</td>
+                        <td>{{ c.student_count }}/{{c.capacity}}</td>
                         <td><a href="/join/{{ c.id }}">Join</a></td>
                     </tr>
                     {% endfor %}
