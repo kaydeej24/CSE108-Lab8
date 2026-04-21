@@ -39,7 +39,7 @@
             background: #2f5aa8;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             cursor: pointer;
         }
     </style>
@@ -49,36 +49,38 @@
 
 <div class="box">
     <h2>{{ course.name }}</h2>
-    <p><b>Teacher:</b> {{ course.teacher }}</p>
+    <p><b>Teacher:</b> {{ course.teacher.name }}</p>
 
     <h3>Students & Grades</h3>
 
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>Action</th>
-        </tr>
+    <!-- ONE FORM for all updates -->
+    <form method="POST">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Grade</th>
+            </tr>
 
-        {% for s in course.students %}
-        <tr>
-            <form method="POST" action="/update_grade/{{ course.id }}">
-                <td>
-                    {{ s.name }}
-                    <input type="hidden" name="name" value="{{ s.name }}">
-                </td>
+            {% for e in course.enrollments %}
+            <tr>
+                <td>{{ e.student.name }}</td>
 
                 <td>
-                    <input type="number" name="grade" value="{{ s.grade }}">
+                    <input 
+                        name="grade_{{ e.id }}" 
+                        value="{{ e.grade or '' }}"
+                        placeholder="{{e.grade}}"
+                    >
                 </td>
+            </tr>
+            {% endfor %}
+        </table>
 
-                <td>
-                    <button type="submit">Update</button>
-                </td>
-            </form>
-        </tr>
-        {% endfor %}
-    </table>
+        <br>
+        <button type="submit">Save Grades</button>
+    </form>
+    <br>
+    <a href="/teacher"> <button> Back to dashboard </button> </a>
 </div>
 
 </body>

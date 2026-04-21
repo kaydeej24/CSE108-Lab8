@@ -150,9 +150,40 @@ def teacher_dashboard():
 
     return render_template("teacher.html", courses=courses_data)
 
-@app.route("/teacher/<int:course_id>")
-def teacher_course():
-    render_template("teacher_course.html")
+@app.route("/teacher/course/<int:course_id>", methods=["GET", "POST"])
+def teacher_course(course_id):
+    if session.get("role") != "teacher":
+        return redirect(url_for("login"))
+
+    course = Class.query.get_or_404(course_id)
+
+    if request.method == "POST":
+        #print("post hit")
+        for key, value in request.form.items():
+            if key.startswith("grade_"):
+                enrollment_id = int(key.split("_")[1])
+                enrollment = Enrollment.query.get(enrollment_id)
+
+                if enrollment:
+                    #print(f"grade hit {key, value}")
+                    enrollment.grade = value
+        
+        db.session.commit()
+
+    enrolled_students = [
+        {
+            "username": e.student.username,
+            "name": e.student.name,
+            "grade": ""  # replace with DB-based grade later
+        }
+        for e in course.enrollments
+    ]
+
+    return render_template(
+        "course.html",
+        course=course,
+        students=enrolled_students
+    )
 
 
 # ---------------- LOGOUT ----------------
